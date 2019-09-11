@@ -13,14 +13,12 @@ extern keymap_config_t keymap_config;
 #define _QWERTY 0
 #define _LOWER 1
 #define _RAISE 2
-#define _NUMPAD 3
 #define _ADJUST 16
 
 enum custom_keycodes {
   QWERTY = SAFE_RANGE,
   LOWER,
   RAISE,
-  NUMPAD,
   ADJUST,
 };
 
@@ -34,14 +32,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|------+------+------+------+------+------|
  * |Shift |   Z  |   X  |   C  |   V  |   B  |   N  |   M  |   ,  |   .  |  Up  |Enter |
  * |------+------+------+------+------+------|------+------+------+------+------+------|
- * |Lower |  OS  | Alt  | Tab  |Raise |Space |Numpad|Raise |Lower | Left | Down |Right |
+ * | Alt  |  OS  | Tab  |Lower |Raise |Space |Space |Raise |Lower | Left | Down |Right |
  * `-----------------------------------------|-----------------------------------------'
  */
 [_QWERTY] = LAYOUT_ortho_4x12( \
   KC_ESC,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSPC, \
   KC_LCTL, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT, \
   KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_UP,   KC_ENT, \
-  LOWER,   KC_LGUI, KC_LALT, KC_TAB,  RAISE,   KC_SPC,  NUMPAD,  RAISE,   LOWER,   KC_LEFT, KC_DOWN, KC_RGHT \
+  KC_LALT, KC_LGUI, KC_TAB,  LOWER,   RAISE,   KC_SPC,  KC_SPC,  RAISE,   LOWER,   KC_LEFT, KC_DOWN, KC_RGHT \
 ),
 
 /* Lower
@@ -80,29 +78,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______ \
 ),
 
-/* Numpad
- * ,-----------------------------------------|-----------------------------------------.
- * |      |      |      |      |      |      |      |  1   |  2   |  3   |      |      |
- * |------+------+------+------+------+------|------+------+------+------+------+------|
- * |      |      |      |      |      |      |      |  4   |  5   |  6   |      |      |
- * |------+------+------+------+------+------|------+------+------+------+------+------|
- * |      |      |      |      |      |      |      |  7   |  8   |  9   |      |      |
- * |------+------+------+------+------+------|------+------+------+------+------+------|
- * |      |      |      |      |      |      |      |      |  0   |      |      |      |
- * `-----------------------------------------|-----------------------------------------'
- */
-[_NUMPAD] = LAYOUT_ortho_4x12( \
-  _______, _______, _______, _______, _______, _______, _______, KC_1,    KC_2,    KC_3,    _______, _______, \
-  _______, _______, _______, _______, _______, _______, _______, KC_4,    KC_5,    KC_6,    _______, _______, \
-  _______, _______, _______, _______, _______, _______, _______, KC_7,    KC_8,    KC_9,    _______, _______, \
-  _______, _______, _______, _______, _______, _______, _______, _______, KC_0,    _______, _______, _______ \
-),
-
 /* Adjust (Lower + Raise)
  * ,-----------------------------------------|-----------------------------------------.
- * |      |      |      |      |      |      |      |Click1|MouseU|Click2|      |Reset |
+ * |Reset |      |      |      |      |      |      |      |      |Click1|MouseU|Click2|
  * |------+------+------+------+------+------|------+------+------+------+------+------|
- * |      | Vol- | Vol+ | Mute |Prtscr| PgUp |      |MouseL|MouseD|MouseR|      |      |
+ * |      | Vol- | Vol+ | Mute |Prtscr| PgUp |      |      |      |MouseL|MouseD|MouseR|
  * |------+------+------+------+------+------|------+------+------+------+------+------|
  * |      | Bri- | Bri+ | Home | End  | PgDn |      |Accel0|Accel1|Accel2|      |      |
  * |------+------+------+------+------+------|------+------+------+------+------+------|
@@ -110,8 +90,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * `-----------------------------------------|-----------------------------------------'
  */
 [_ADJUST] =  LAYOUT_ortho_4x12( \
-  _______, _______, _______, _______, _______, _______, _______, KC_BTN1, KC_MS_U, KC_BTN2, _______, RESET, \
-  _______, KC_VOLD, KC_VOLU, KC_MUTE, KC_PSCR, KC_PGUP, _______, KC_MS_L, KC_MS_D, KC_MS_R, _______, _______, \
+  RESET,   _______, _______, _______, _______, _______, _______, _______, _______, KC_BTN1, KC_MS_U, KC_BTN2, \
+  _______, KC_VOLD, KC_VOLU, KC_MUTE, KC_PSCR, KC_PGUP, _______, _______, _______, KC_MS_L, KC_MS_D, KC_MS_R, \
   _______, KC_BRID, KC_BRIU, KC_HOME, KC_END,  KC_PGDN, _______, KC_ACL0, KC_ACL1, KC_ACL2, _______, _______, \
   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______ \
 )
@@ -156,14 +136,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       } else {
         layer_off(_RAISE);
         update_tri_layer(_LOWER, _RAISE, _ADJUST);
-      }
-      return false;
-      break;
-    case NUMPAD:
-      if (record->event.pressed) {
-        layer_on(_NUMPAD);
-      } else {
-        layer_off(_NUMPAD);
       }
       return false;
       break;
